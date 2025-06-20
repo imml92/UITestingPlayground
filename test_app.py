@@ -4,7 +4,7 @@ from playwright.sync_api import TimeoutError, BrowserContext, Page, expect, Brow
 
 @pytest.fixture(autouse=True)
 def page(playwright: Playwright):
-    browser = playwright.chromium.launch(args=['--start-maximized'], headless=False)
+    browser = playwright.chromium.launch(args=['--start-maximized'], headless=True)
     page = browser.new_page(no_viewport=True)
     print("\n[ Fixture ]: Opening page...\n")
     page.goto("http://uitestingplayground.com/")
