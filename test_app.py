@@ -4,7 +4,7 @@ from playwright.sync_api import TimeoutError, BrowserContext, Page, expect, Brow
 
 @pytest.fixture(autouse=True)
 def page(playwright: Playwright):
-    browser = playwright.chromium.launch(args=['--start-maximized'], headless=True)
+    browser = playwright.chromium.launch(args=['--start-maximized'], headless=False)
     page = browser.new_page(no_viewport=True)
     print("\n[ Fixture ]: Opening page...\n")
     page.goto("http://uitestingplayground.com/")
@@ -220,21 +220,25 @@ def test_non_breaking_space(page: Page):
 
     expect(btn).to_be_visible()
 
-# def test_overlapped_element(page: Page):
-#     page.get_by_role("link",name="Overlapped Element").click()
+def test_overlapped_element(page: Page):
+    page.get_by_role("link",name="Overlapped Element").click()
 
+    overlapped = page.get_by_placeholder("Name")
+
+    print("Text before scroll down:", overlapped.input_value())
+    expect(overlapped).to_be_visible()
+
+    # It doesnt work because we are seeing a fraction of the element
+    # overlapped.scroll_into_view_if_needed()
+    div = overlapped.locator("..")
+    div.hover()
     
+    page.mouse.wheel(0, 200)
+    # We have to wait for the element to be displayed
+    overlapped.wait_for()
 
-#     overlapped = page.get_by_placeholder("Name")
-#     expect(overlapped).to_be_visible()
+    overlapped.fill("rina")
 
-#     # It doesnt work because we are seeing a fraction of the element
-#     # overlapped.scroll_into_view_if_needed()
-#     div = overlapped.locator("..")
-#     div.hover()
-    
-#     page.mouse.wheel(0, 200)
+    print("Text after scroll down:", overlapped.input_value())
 
-#     overlapped.fill("rina")
-
-#     expect(overlapped).to_have_value("rina")
+    expect(overlapped).to_have_value("rina")
