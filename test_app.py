@@ -1,9 +1,11 @@
 import pytest
 from models.login_page import LoginPage
-from playwright.sync_api import TimeoutError, BrowserContext, Page, expect
+from playwright.sync_api import TimeoutError, BrowserContext, Page, expect, Browser, Playwright
 
 @pytest.fixture(autouse=True)
-def page(page: Page):
+def page(playwright: Playwright):
+    browser = playwright.chromium.launch(args=['--start-maximized'], headless=False)
+    page = browser.new_page(no_viewport=True)
     print("\n[ Fixture ]: Opening page...\n")
     page.goto("http://uitestingplayground.com/")
 
@@ -221,7 +223,10 @@ def test_non_breaking_space(page: Page):
 def test_overlapped_element(page: Page):
     page.get_by_role("link",name="Overlapped Element").click()
 
+    
+
     overlapped = page.get_by_placeholder("Name")
+    expect(overlapped).to_be_visible()
 
     # It doesnt work because we are seeing a fraction of the element
     # overlapped.scroll_into_view_if_needed()
