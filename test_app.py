@@ -1,4 +1,5 @@
 import pytest
+import time
 from models.login_page import LoginPage
 from playwright.sync_api import TimeoutError, BrowserContext, Page, expect, Browser, Playwright
 
@@ -235,7 +236,8 @@ def test_overlapped_element(page: Page):
     
     page.mouse.wheel(0, 200)
     # We have to wait for the element to be displayed
-    overlapped.wait_for()
+    overlapped.wait_for(state='visible')
+    time.sleep(1)
 
     overlapped.fill("rina")
 
